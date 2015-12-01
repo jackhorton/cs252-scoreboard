@@ -1,0 +1,24 @@
+{
+  "name": "cs252-scoreboard",
+  "version": "0.0.1",
+  "description": "A scoreboard for CS252 projects",
+  "main": "index.js",
+  "scripts": {
+    "test": "gulp lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jackhorton/cs252-scoreboard.git"
+  },
+  "author": "Jack Horton, Mason Herhusky, Garrett Lewis",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jackhorton/cs252-scoreboard/issues"
+  },
+  "homepage": "https://github.com/jackhorton/cs252-scoreboard#readme",
+  "devDependencies": {
+    "forever-monitor": "^1.7.0",
+    "gulp": "^3.9.0",
+    "gulp-eslint": "^1.1.1"
+  }
+}
