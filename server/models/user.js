@@ -14,6 +14,8 @@ const onCreating = Bluebird.method((model) => {
     if (!(model.get('email') && regex.test(model.get('email')))) {
         throw new ErrorCode(422, 'Invalid email address');
     }
+
+    model.set('api_token', uuid.v4());
 });
 
 const onSaving = Bluebird.method((model) => {
@@ -35,11 +37,9 @@ const Model = bookshelf.Model.extend({
     tableName: 'users',
     hasTimestamps: true,
     initialize() {
-        this.on('creating', (model) => {
-            model.set('api_token', uuid.v4());
-        });
-        this.on('saving', onSaving, this);
-    }
+        this.on('creating', onCreating);
+        this.on('saving', onSaving);
+    },
     serialize(additional = {}) {
         return Object.assign({}, this.omit('password'), additional);
     }

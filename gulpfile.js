@@ -6,7 +6,7 @@ const gulp = require('gulp');
 const eslint = require('gulp-eslint');
 const forever = require('forever-monitor');
 
-const globs = ['src/**/*.js', 'server.js', 'gulpfile.js'];
+const globs = ['server/**/*.js', 'client/**/*.(js|jsx)', 'server.js', 'gulpfile.js'];
 const server = new forever.Monitor('./index.js');
 let isRunning = false;
 
@@ -28,7 +28,8 @@ gulp.task('lint', () => {
 });
 
 // TODO: this task is awkward and i dont like it. Fix it, eventually
-gulp.task('watch:run', () => {
+// lol jk no i wont, its been like this for months
+gulp.task('watch:run', ['run'], () => {
     gulp.watch(globs, ['run']);
 });
 
@@ -48,4 +49,4 @@ gulp.task('run', ['lint'], () => {
     }
 });
 
-gulp.task('serve', ['run', 'watch:run']);
+gulp.task('serve', ['watch:run']);
