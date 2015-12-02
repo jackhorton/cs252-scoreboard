@@ -10,6 +10,11 @@ const Model = bookshelf.Model.extend({
     tableName: 'reset_password',
     initialize() {
         this.on('creating', (model) => {
+            const expire = new Date(Date.now());
+
+            expire.setMinutes(expire.getMinutes() + 30);
+            model.set('expire_date', expire);
+
             return new Model({user_id: model.get('user_id')}).fetch().then((rt) => {
 
                 // TODO: if we have this existing reset token for the user,
@@ -63,7 +68,7 @@ export function register() {
         schema.increments('id').primary();
         schema.integer('user_id').unique();
         schema.string('reset_token').unique();
-        schema.dateTime('expire_date').defaultTo(bookshelf.knex.raw('now() + INTERVAL \'30 minutes\''));
+        schema.dateTime('expire_date').notNullable();
     });
 
     bookshelf.model('PasswordReset', Model);

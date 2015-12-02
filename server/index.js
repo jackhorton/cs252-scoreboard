@@ -8,7 +8,7 @@ initModels();
 
 app.use(userController());
 
-app.use((err, req, res, next) => {
+app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
     console.error('==============================');
     console.error(`ERROR: ${err.message}`);
 
@@ -17,12 +17,17 @@ app.use((err, req, res, next) => {
         console.error(`STACK\n${err.stack}`);
     } else {
         res.status(err.code).send({status: 'failure', error: err.message});
-        console.error(`ORIGINAL STACK\n${err.original.stack}`);
-        console.error(`STACK\n${err.stack}`);
+
+        if (err.code >= 500) {
+            if (err.original) {
+                console.error(`ORIGINAL STACK\n${err.original.stack}`);
+            }
+
+            console.error(`STACK\n${err.stack}`);
+        }
     }
 
     console.error('==============================');
-    return next();
 });
 
 export default app;

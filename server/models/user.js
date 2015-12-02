@@ -9,7 +9,7 @@ const bcryptCompare = Bluebird.promisify(bcrypt.compare);
 const bcryptHash = Bluebird.promisify(bcrypt.hash);
 
 const onCreating = Bluebird.method((model) => {
-    const regex = /^[a-z\d]{,8}@purdue\.edu$/ig;
+    const regex = /^[\w\d]{6,9}@purdue\.edu$/ig;
 
     if (!(model.get('email') && regex.test(model.get('email')))) {
         throw new ErrorCode(422, 'Invalid email address');

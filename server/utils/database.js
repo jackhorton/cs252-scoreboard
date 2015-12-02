@@ -10,8 +10,8 @@ const database = knex({
         database: process.env.CS252_DB_DATABASE
     },
     pool: {
-        min: 0,
-        max: 2
+        min: 1,
+        max: 1
     }
 });
 const orm = bookshelf(database);

@@ -7,7 +7,7 @@ const router = express.Router(); // eslint-disable-line new-cap
 let User;
 let PasswordResetToken;
 
-export function routes() {
+export default function routes() {
     [User, PasswordResetToken] = get.models('User', 'PasswordResetToken');
     return router;
 };

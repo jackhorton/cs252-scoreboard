@@ -1,6 +1,7 @@
-import user from './user';
+import * as user from './user';
+import * as pr from './password-reset';
 
-const models = [user];
+const models = [user, pr];
 
 export default function initialize() {
     models.forEach((model) => {
