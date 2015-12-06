@@ -5,8 +5,17 @@
 const gulp = require('gulp');
 const eslint = require('gulp-eslint');
 const forever = require('forever-monitor');
+const source = require('vinyl-source-stream');
+const buffer = require('vinyl-buffer');
+const browserify = require('browserify');
+const babelify = require('babelify');
+const less = require('gulp-less');
+const autoprefixer = require('gulp-autoprefixer');
+const path = require('path');
 
-const globs = ['server/**/*.js', 'client/**/*.(js|jsx)', 'server.js', 'gulpfile.js'];
+const serverGlobs = ['server/**/*.js', 'client/index.js', 'server.js', 'gulpfile.js'];
+const clientGlobs = ['client/**/*.jsx'];
+const lessGlobs = ['client/**/*.less'];
 const server = new forever.Monitor('./index.js');
 let isRunning = false;
 
@@ -20,20 +29,55 @@ server.on('exit', () => {
     console.log(`DEV: exiting server at ${Date.now()}`);
 });
 
-gulp.task('lint', () => {
-    return gulp.src(globs)
+gulp.task('lint:server', () => {
+    return gulp.src(serverGlobs)
         .pipe(eslint())
         .pipe(eslint.format())
         .pipe(eslint.failAfterError());
 });
 
-// TODO: this task is awkward and i dont like it. Fix it, eventually
-// lol jk no i wont, its been like this for months
-gulp.task('watch:run', ['run'], () => {
-    gulp.watch(globs, ['run']);
+gulp.task('lint:jsx', () => {
+    return gulp.src(clientGlobs)
+        .pipe(eslint())
+        .pipe(eslint.format())
+        .pipe(eslint.failAfterError());
 });
 
-gulp.task('run', ['lint'], () => {
+gulp.task('lint', ['lint:server', 'lint:jsx']);
+
+gulp.task('less', () => {
+    gulp.src('client/app.less')
+        .pipe(less({
+            paths: [path.join(__dirname, 'client')]
+        }))
+        .pipe(autoprefixer())
+        .pipe(gulp.dest('./dist/css'));
+});
+
+gulp.task('watch:less', ['less'], () => {
+    gulp.watch(lessGlobs, ['less']);
+});
+
+gulp.task('jsx', ['lint:jsx'], () => {
+    return browserify('client/app.jsx', {
+        extensions: ['.jsx'],
+        debug: true
+    }).transform(babelify, {presets: ['es2015', 'react']})
+    .bundle()
+    .pipe(source('bundle.js'))
+    .pipe(buffer())
+    .pipe(gulp.dest('./dist/js'));
+});
+
+gulp.task('watch:jsx', ['jsx'], () => {
+    gulp.watch(clientGlobs, ['jsx']);
+});
+
+gulp.task('client', ['jsx', 'less']);
+
+gulp.task('watch:client', ['watch:jsx', 'watch:less']);
+
+gulp.task('server', ['lint:server'], () => {
     if (isRunning) {
         server.stop();
 
@@ -49,4 +93,10 @@ gulp.task('run', ['lint'], () => {
     }
 });
 
-gulp.task('serve', ['watch:run']);
+gulp.task('watch:server', ['server'], () => {
+    gulp.watch(serverGlobs, ['server']);
+});
+
+gulp.task('watch', ['watch:server', 'watch:client']);
+
+gulp.task('default', ['server', 'client']);

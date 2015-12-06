@@ -1,5 +1,9 @@
 {
     "extends": "../.eslintrc.json",
+    "ecmaFeatures": {
+        "jsx": true
+    },
+    "plugins": ["react"],
     "env": {
         "node": false,
         "browser": true,
