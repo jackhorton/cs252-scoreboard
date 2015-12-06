@@ -61,7 +61,6 @@ const onCreated = Bluebird.method((model, response, options) => {
 
 const User = bookshelf.Model.extend({
     tableName: 'users',
-    hasTimestamps: true,
     initialize() {
         this.on('creating', onCreating);
         this.on('saving', onSaving);
