@@ -1,11 +1,14 @@
 import React from 'react';
+import Nav from './nav';
 
 const Main = React.createClass({
     render() {
         return (
-            <div>
-                <p>welcome</p>
-                {this.props.children}
+            <div className="container">
+                <div className="col-md-6 col-md-offset-3">
+                    <Nav></Nav>
+                    {this.props.children}
+                </div>
             </div>
         );
     }

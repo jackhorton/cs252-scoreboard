@@ -48,7 +48,7 @@ gulp.task('lint', ['lint:server', 'lint:jsx']);
 gulp.task('less', () => {
     gulp.src('client/app.less')
         .pipe(less({
-            paths: [path.join(__dirname, 'client')]
+            paths: [path.join(__dirname, 'client', 'styles')]
         }))
         .pipe(autoprefixer())
         .pipe(gulp.dest('./dist/css'));
