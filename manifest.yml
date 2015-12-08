@@ -1,2 +1,2 @@
-buildpack: https://github.com/cloudfoundry/nodejs-buildpack
+buildpack: https://github.com/cloudfoundry/nodejs-buildpack.git
 command: node index.js
