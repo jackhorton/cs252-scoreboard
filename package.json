@@ -6,6 +6,9 @@
   "scripts": {
     "build": "gulp lint client"
   },
+  "engines": {
+    "node": "^4.2.1"  
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jackhorton/cs252-scoreboard.git"
