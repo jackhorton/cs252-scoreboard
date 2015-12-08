@@ -14,18 +14,6 @@ export default function routes() {
 
 /* ********* route initialization ********* */
 
-router.post('/accounts/create', (req, res, next) => {
-    const {email, password, name} = req.body;
-
-    User.createFull({email, password, name}).then((user) => {
-        res.status(200).send(user.toJSON({status: 'success'}));
-    }).catch(ErrorCode, (err) => {
-        next(err);
-    }).catch((err) => {
-        next(new ErrorCode(500, 'Could not create account', err));
-    });
-});
-
 router.post('/accounts/login', (req, res, next) => {
     const {email, password} = req.body;
 

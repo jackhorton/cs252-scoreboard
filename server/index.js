@@ -1,12 +1,14 @@
 import express from 'express';
 import initModels from './models/init';
 import userController from './controllers/user';
+import signUpController from './controllers/sign-up';
 
 const app = express();
 
 initModels();
 
 app.use(userController());
+app.use(signUpController());
 
 app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
     console.error('==============================');

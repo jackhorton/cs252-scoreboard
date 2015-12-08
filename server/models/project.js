@@ -21,31 +21,14 @@ const Project = bookshelf.Model.extend({
         return user.load('project').then((loaded) => loaded.related('project'));
     }),
     create: Bluebird.method((attrs = {}) => {
-        const {title, description, link, user, emails} = attrs;
+        const {title, description, link} = attrs;
 
-        if (!(_.isString(title) && _.isString(description) && _.isString(link) && _.isArray(emails))) {
+        if (!(_.isString(title) && _.isString(description) && _.isString(link))) {
             throw new ErrorCode(422, 'Invalid parameters');
         }
 
         return new Project({title, description, link}).save().catch((err) => {
             throw new ErrorCode(403, 'Unable to create project', err);
-        }).then((project) => {
-            return new User({id: user.id}).save(
-                {project_id: project.get('id')},
-                {patch: true, method: 'update'}
-            ).then(() => {
-                return Bluebird.map(emails, (email) => {
-                    return new User({email, project_id: project.get('id')}).save(null, {createEmpty: true});
-                });
-            }).then(() => {
-                return project;
-            }).catch((userError) => {
-                return project.destroy().catch((projectError) => {
-                    throw new ErrorCode(500, 'A total fuckup has occurred', projectError);
-                }).then(() => {
-                    throw new ErrorCode(403, 'Could not set up users for this project. Maybe one of them already exists?', userError);
-                });
-            });
         });
     })
 });

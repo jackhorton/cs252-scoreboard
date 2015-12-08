@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import _ from 'lodash';
 import Bluebird from 'bluebird';
 import uuid from 'node-uuid';
 import bookshelf from '../utils/database';
@@ -13,10 +14,12 @@ const bcryptHash = Bluebird.promisify(bcrypt.hash);
 let Project;
 
 function onCreating(model, attrs, options) {
-    const regex = /^[\w\d]{6,9}@purdue\.edu$/ig;
+    if (process.env.NODE_ENV === 'production') {
+        const regex = /^[\w\d]{6,9}@purdue\.edu$/ig;
 
-    if (!(model.get('email') && regex.test(model.get('email')))) {
-        throw new ErrorCode(422, 'Invalid email address');
+        if (!(model.get('email') && regex.test(model.get('email')))) {
+            throw new ErrorCode(422, 'Invalid email address');
+        }
     }
 
     if (options.shim) {
@@ -47,30 +50,40 @@ const onSaving = Bluebird.method((model, attrs, options) => {
     }
 });
 
-const onCreated = Bluebird.method((model, response, options) => {
-    if (options.shim) {
-        return model.fetch({withRelated: ['project', 'project.users']}).then((user) => {
-            return sendMail({
-                to: user.get('email'),
-                subject: 'You have been invited to a new project in CS252',
-                text: `${user.related('project.users').find('active', true).get('name')} invited you to a project on the CS252 final project scoreboard. Click on the link below to accept this invitation, which will also allow you to rate other's projects!\n\nhttp://cs252-scoreboard.bluemix.net/#/invite/${user.get('api_token')}`
-            });
-        });
-    }
-});
-
 const User = bookshelf.Model.extend({
     tableName: 'users',
     initialize() {
         this.on('creating', onCreating);
         this.on('saving', onSaving);
-        this.on('created', onCreated);
     },
     project() {
         return this.belongsTo(Project, 'project_id');
     },
     serialize(additional = {}) {
         return Object.assign({}, this.omit('password'), additional);
+    },
+    sendInviteEmails() {
+        return this.fetch({withRelated: {
+            'project.users': (query) => {
+                query.where({active: false});
+            }
+        }}).then((user) => {
+            const users = user.related('project').related('users');
+
+            if (process.env.NODE_ENV === 'production') {
+                return Bluebird.map(users.toArray(), (invited) => {
+                    return sendMail({
+                        to: invited.get('email'),
+                        subject: 'You have been invited to a new project in CS252',
+                        text: `${user.get('name')} invited you to a project on the CS252 final project scoreboard. Click on the link below to accept this invitation, which will also allow you to rate other's projects!\n\nhttp://cs252-scoreboard.bluemix.net/#/invite/${invited.get('api_token')}`
+                    });
+                });
+            } else {
+                users.each((invited) => {
+                    console.log(`Emailing ${invited.get('email')} with token ${invited.get('api_token')}`);
+                });
+            }
+        });
     }
 }, {
     login: Bluebird.method((attrs = {}) => {
@@ -93,25 +106,27 @@ const User = bookshelf.Model.extend({
         });
     }),
     createFull: Bluebird.method((attrs = {}) => {
-        const {email, password, name} = attrs;
+        const {email, password, name, projectId} = attrs;
 
-        return new User({email, password, name}).save();
+        return new User({email, password, name, project_id: projectId}).save();
     }),
     createFromShim: Bluebird.method((attrs = {}) => {
-        const {api_token: apiToken, password, name} = attrs;
+        const {apiToken, password, name} = attrs;
 
-        if (!password) {
+        if (!(_.isString(password) && _.isString(name))) {
             throw new ErrorCode(422, 'Invalid account initialization');
         }
 
-        return new User({api_token: apiToken}).fetch({require: true}).then((user) => {
-            return user.save({password, name});
+        return new User({api_token: apiToken, active: false}).fetch({require: true}).then((user) => {
+            return user.set({password, name, active: true}).save();
+        }).catch((err) => {
+            throw new ErrorCode(403, 'Could not sign up', err);
         });
     }),
     createShim: Bluebird.method((attrs = {}) => {
-        const {email, name} = attrs;
+        const {email, projectId} = attrs;
 
-        return new User({email, name}).save(null, {shim: true});
+        return new User({email, project_id: projectId}).save(null, {shim: true});
     })
 });
 
@@ -127,7 +142,7 @@ export function register() {
         schema.string('password');
         schema.string('api_token').unique();
         schema.boolean('active').notNullable().defaultTo(false);
-        schema.integer('project_id').references('id').inTable('projects');
+        schema.integer('project_id').references('id').inTable('projects').notNullable();
     });
 
     bookshelf.model('User', User);
