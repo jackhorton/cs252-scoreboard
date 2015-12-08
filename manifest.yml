@@ -1,0 +1,2 @@
+buildpack: https://github.com/cloudfoundry/nodejs-buildpack
+command: node index.js
