@@ -2,7 +2,7 @@ import React from 'react';
 import reqwest from 'reqwest';
 import config from '../../config';
 
-const SignIn = React.createClass({
+const SignUp = React.createClass({
     getInitialState() {
         return {
             name: '',
@@ -141,4 +141,4 @@ const SignIn = React.createClass({
     }
 });
 
-export default SignIn;
+export default SignUp;

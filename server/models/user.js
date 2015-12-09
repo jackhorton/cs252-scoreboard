@@ -60,7 +60,10 @@ const User = bookshelf.Model.extend({
         return this.belongsTo(Project, 'project_id');
     },
     serialize(additional = {}) {
-        return Object.assign({}, this.omit('password'), additional);
+        return Object.assign({}, {
+            user: this.omit('password'),
+            project: this.related('project')
+        }, additional);
     },
     sendInviteEmails() {
         return this.fetch({withRelated: {

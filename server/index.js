@@ -20,7 +20,7 @@ app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
     } else {
         res.status(err.code).send({status: 'failure', error: err.message});
 
-        if (err.code >= 500) {
+        if (err.code > 401) {
             if (err.original) {
                 console.error(`ORIGINAL STACK\n${err.original.stack}`);
             }

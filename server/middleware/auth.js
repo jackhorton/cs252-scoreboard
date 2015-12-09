@@ -6,9 +6,8 @@ import ErrorCode from '../utils/error';
  * @return {Function} - an express middleware to check for a valid token in the query parameter
  */
 export default function authorize({required = true} = {}) {
-    const [User] = get.models('User');
-
     return (req, res, next) => {
+        const [User] = get.models('User');
         const token = req.query.api_token || req.body.api_token;
 
         if (!token) {
@@ -18,7 +17,7 @@ export default function authorize({required = true} = {}) {
                 return next();
             }
         } else {
-            User.where('api_token', token).fetch({require: true}).then((user) => {
+            new User({api_token: token}).fetch({withRelated: 'project', require: true}).then((user) => {
                 req.user = user.toJSON();
                 return next();
             }).catch(() => {
