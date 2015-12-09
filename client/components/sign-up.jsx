@@ -1,5 +1,6 @@
 import React from 'react';
 import reqwest from 'reqwest';
+import cookie from 'js-cookie';
 import config from '../../config';
 
 const SignUp = React.createClass({
@@ -12,7 +13,8 @@ const SignUp = React.createClass({
             description: '',
             link: '',
             emails: [''],
-            loading: false
+            loading: false,
+            error: ''
         };
     },
     updateOnChange(event) {
@@ -50,6 +52,7 @@ const SignUp = React.createClass({
     },
     submit(event) {
         const {name, email, password, title, description, link, emails} = this.state;
+        let redirected = false;
 
         event.preventDefault();
 
@@ -72,22 +75,28 @@ const SignUp = React.createClass({
                     emails
                 }
             }),
-            success(response) {
-                console.log(response);
+            success: (response) => {
+                cookie.set('api_token', response.user.api_token, {expires: 365});
+                redirected = true;
+                this.props.history.replaceState(null, '/');
             },
-            error(err) {
+            error: (err) => {
                 console.error(err);
+                this.setState({
+                    error: JSON.parse(err.response).error
+                });
             },
             complete: () => {
-                this.setState({loading: false});
+                if (!redirected) {
+                    this.setState({loading: false});
+                }
             }
         });
     },
     render() {
-        const {name, email, password, title, description, link, emails} = this.state;
-
-        return (
-            <div className="sign-up cs-form">
+        const {name, email, password, title, description, link, emails, loading, error} = this.state;
+        const form = (
+            <div>
                 <h2>Personal information</h2>
                 <div className="panel panel-default col-md-12">
                     <form>
@@ -136,6 +145,31 @@ const SignUp = React.createClass({
                 <div className="col-md-12 text-center">
                     <button className="btn btn-success col-md-6 col-md-offset-3" onClick={this.submit} disabled={this.state.loading}>Submit</button>
                 </div>
+            </div>
+        );
+        const errorbox = (
+            <div className="panel panel-default col-md-12">
+                <h4>{error}</h4>
+            </div>
+        );
+        const loadingbox = (
+            <div className="panel panel-default col-md-12">
+                <h4>Loading...</h4>
+            </div>
+        );
+
+        let content;
+
+        if (loading) {
+            content = loadingbox;
+        } else {
+            content = form;
+        }
+
+        return (
+            <div className="cs-form sign-up">
+                {error.length > 0 && errorbox}
+                {content}
             </div>
         );
     }

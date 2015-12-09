@@ -21,19 +21,19 @@ router.post('/sign-up/new', (req, res, next) => {
     Project.create({title, description, link}).then((project) => {
         return User.createFull({email, name, password, projectId: project.get('id')}).then((user) => {
             return Bluebird.map(emails, (inviteEmail) => {
+                if (inviteEmail.length === 0) {
+                    return Bluebird.resolve();
+                }
+
                 return User.createShim({email: inviteEmail, projectId: project.get('id'), user});
             }).then(() => {
                 return user.sendInviteEmails();
             }).then(() => {
-                return [user, project];
+                return user;
             });
         });
-    }).then(([user, project]) => {
-        res.status(200).send({
-            user: user.toJSON(),
-            project: project.toJSON(),
-            status: 'success'
-        });
+    }).then((user) => {
+        res.status(200).send(user.toJSON({status: 'success'}));
     }).catch(ErrorCode, (err) => {
         next(err);
     }).catch((err) => {
