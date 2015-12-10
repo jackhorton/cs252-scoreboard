@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import initModels from './models/init';
 import userController from './controllers/user';
 import signUpController from './controllers/sign-up';
+import projectController from './controllers/project';
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(bodyParser.json());
 
 app.use(userController());
 app.use(signUpController());
+app.use(projectController());
 
 app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
     console.error('==============================');
