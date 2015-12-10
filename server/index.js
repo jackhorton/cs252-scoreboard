@@ -1,4 +1,6 @@
 import express from 'express';
+import cookieParser from 'cookie-parser';
+import bodyParser from 'body-parser';
 import initModels from './models/init';
 import userController from './controllers/user';
 import signUpController from './controllers/sign-up';
@@ -6,6 +8,9 @@ import signUpController from './controllers/sign-up';
 const app = express();
 
 initModels();
+
+app.use(cookieParser());
+app.use(bodyParser.json());
 
 app.use(userController());
 app.use(signUpController());

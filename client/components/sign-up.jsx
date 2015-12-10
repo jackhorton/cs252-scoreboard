@@ -17,6 +17,11 @@ const SignUp = React.createClass({
             error: ''
         };
     },
+    componentWillMount() {
+        if (this.props.user) {
+            this.props.history.replaceState(null, '/');
+        }
+    },
     updateOnChange(event) {
         if (event.target.id && event.target.id.includes('emails')) {
             const newEmails = this.state.emails;

@@ -8,7 +8,7 @@ import ErrorCode from '../utils/error';
 export default function authorize({required = true} = {}) {
     return (req, res, next) => {
         const [User] = get.models('User');
-        const token = req.query.api_token || req.body.api_token;
+        const token = req.query.api_token || req.body.api_token || req.cookies.api_token;
 
         if (!token) {
             if (required) {
