@@ -30,6 +30,23 @@ router.post('/sign-up/new', (req, res, next) => {
                 return user.sendInviteEmails();
             }).then(() => {
                 return user;
+            }).catch((err) => {
+                return User.where({email}).destroy().then(() => {
+                    return Bluebird.map(emails, (inviteEmail) => {
+                        return User.where({email: inviteEmail, active: false}).destroy();
+                    });
+                }).then(() => {
+                    throw new ErrorCode(422, 'Could not create other project users. Maybe they already have accounts?', err);
+                });
+            });
+        }).catch((err) => {
+            return Project.where({title, description, link}).destroy().then(() => {
+                if (err instanceof ErrorCode) {
+                    throw err;
+                } else {
+                    throw new ErrorCode(422, 'Could not create users for this project', err);
+                }
+
             });
         });
     }).then((user) => {
