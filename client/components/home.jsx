@@ -74,7 +74,7 @@ const Home = React.createClass({
                 <div className="projects">
                     {projects.map((project) => {
                         return (
-                            <Project key={project.id} project={project} onRate={this.getProjects}></Project>
+                            <Project key={project.id} project={project} onRate={this.getProjects} isLoggedIn={!!this.props.user}></Project>
                         );
                     })}
                 </div>

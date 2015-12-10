@@ -32,7 +32,7 @@ const Project = React.createClass({
                     </div>
                     <div className="col-sm-6 text-right">
                         <h5>{project.score === null ? 'Be the first to rate this project' : `Total rating: ${project.score}`}</h5>
-                        {[1, 2, 3, 4, 5].map((i) => {
+                        {this.props.isLoggedIn && [1, 2, 3, 4, 5].map((i) => {
                             return <button key={i} className={`rating-btn btn btn-${project.userRating === i ? 'primary' : 'default'}`} onClick={this.rate}>{i}</button>;
                         })}
                     </div>
