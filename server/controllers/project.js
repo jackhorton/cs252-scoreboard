@@ -15,10 +15,12 @@ export default function routes() {
 
 /* ********* route initialization ********* */
 
-router.get('/projects', (req, res, next) => {
+router.get('/projects', authorize({required: false}), (req, res, next) => {
+    const userId = req.user && req.user.id;
+
     Projects.retrieve().then((projects) => {
         res.status(200).send({
-            projects: projects.toJSON(),
+            projects: projects.toJSON({userId}),
             status: 'success'
         });
     }).catch(ErrorCode, (err) => {

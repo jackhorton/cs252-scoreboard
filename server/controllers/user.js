@@ -34,7 +34,7 @@ router.get('/account', authorize(), (req, res) => {
 });
 
 router.get('/account/tap', authorize({required: false}), (req, res) => {
-    res.status(200).send(Object.assign({}, req.user, {status: 'success'}));
+    res.status(200).send(Object.assign({}, {user: req.user, status: 'success'}));
 });
 
 router.post('/accounts/reset/request', (req, res, next) => {

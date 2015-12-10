@@ -12,6 +12,9 @@ const Home = React.createClass({
         };
     },
     componentDidMount() {
+        this.getProjects();
+    },
+    getProjects() {
         reqwest({
             url: '/api/projects',
             method: 'get',
@@ -71,7 +74,7 @@ const Home = React.createClass({
                 <div className="projects">
                     {projects.map((project) => {
                         return (
-                            <Project key={project.id} project={project}></Project>
+                            <Project key={project.id} project={project} onRate={this.getProjects}></Project>
                         );
                     })}
                 </div>

@@ -18,7 +18,7 @@ export default function authorize({required = true} = {}) {
             }
         } else {
             new User({api_token: token}).fetch({withRelated: 'project', require: true}).then((user) => {
-                req.user = user.toJSON();
+                req.user = user.toJSON().user;
                 req.userModel = user;
                 return next();
             }).catch(() => {

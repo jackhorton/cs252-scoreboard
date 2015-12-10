@@ -3,12 +3,13 @@ import makeTable from '../utils/make-table';
 import ErrorCode from '../utils/error';
 
 const Rating = bookshelf.Model.extend({
-    tableName: 'ratings'
+    tableName: 'ratings',
+    idAttribute: ['user_id', 'project_id']
 }, {
     upsert({projectId, userId, value} = {}) {
         return new Rating({project_id: projectId, user_id: userId}).fetch().then((rating) => {
             if (rating) {
-                return rating.set({rating: value}).save(null, {method: 'update'});
+                return rating.where({project_id: projectId, user_id: userId}).save({rating: value}, {patch: true, method: 'update'});
             }
 
             return new Rating({project_id: projectId, user_id: userId, rating: value}).save(null, {method: 'insert'});

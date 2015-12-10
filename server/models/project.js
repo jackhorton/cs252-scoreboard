@@ -24,14 +24,22 @@ const Project = bookshelf.Model.extend({
     ratings() {
         return this.hasMany(Rating, 'project_id');
     },
-    serialize() {
-        let score = 0;
+    serialize({userId} = {}) {
+        let userRating = null;
+        let score;
         let teamMembers;
 
         if (this.related('ratings')) {
-            score = this.related('ratings').reduce((total, cur) => {
-                return total + cur.value;
-            }, 0) / this.related('ratings').size();
+            let total = 0;
+
+            this.related('ratings').map((cur) => {
+                total += cur.get('rating');
+                if (cur.get('user_id') === userId) {
+                    userRating = cur.get('rating');
+                }
+            });
+
+            score = total > 0 ? total / this.related('ratings').size() : null;
         }
 
         if (this.related('users')) {
@@ -44,6 +52,7 @@ const Project = bookshelf.Model.extend({
         }
 
         return Object.assign({}, this.attributes, {
+            userRating,
             score,
             teamMembers
         });
