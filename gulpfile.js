@@ -9,6 +9,7 @@ const source = require('vinyl-source-stream');
 const buffer = require('vinyl-buffer');
 const browserify = require('browserify');
 const babelify = require('babelify');
+const envify = require('envify');
 const less = require('gulp-less');
 const autoprefixer = require('gulp-autoprefixer');
 const path = require('path');
@@ -19,7 +20,10 @@ const lessGlobs = ['client/**/*.less'];
 const server = new forever.Monitor('./index.js');
 let isRunning = false;
 
-process.env.NODE_ENV = 'development';
+if (!process.env.NODE_ENV) {
+    process.env.NODE_ENV = 'development';
+}
+
 process.env.PGSSLMODE = 'require';
 
 server.on('start', () => {
@@ -62,7 +66,9 @@ gulp.task('jsx', ['lint:jsx'], () => {
     return browserify('client/app.jsx', {
         extensions: ['.jsx'],
         debug: true
-    }).transform(babelify, {presets: ['es2015', 'react']})
+    })
+    .transform(babelify, {presets: ['es2015', 'react']})
+    .transform(envify)
     .bundle()
     .pipe(source('bundle.js'))
     .pipe(buffer())

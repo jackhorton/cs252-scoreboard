@@ -1,2 +1,2 @@
 buildpack: https://github.com/cloudfoundry/nodejs-buildpack.git
-command: node index.js
+command: ./node_modules/.bin/gulp client && node index.js

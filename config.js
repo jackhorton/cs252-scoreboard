@@ -1,3 +1,11 @@
+let host;
+
+if (process.env.NODE_ENV === 'production') {
+    host = 'http://cs252-scoreboard.mybluemix.net';
+} else {
+    host = 'http://localhost:8000';
+}
+
 export default {
-    host: process.env.NODE_ENV === 'production' ? 'http://cs252-scoreboard.mybluemix.net' : 'http://localhost:8000'
+    host
 };
