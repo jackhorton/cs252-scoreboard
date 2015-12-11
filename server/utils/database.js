@@ -3,8 +3,7 @@ import bookshelf from 'bookshelf';
 
 const database = knex({
     client: 'pg',
-    connection: process.env.CS252_DATABASE,
-    debug: true
+    connection: process.env.CS252_DATABASE
 });
 const orm = bookshelf(database);
 

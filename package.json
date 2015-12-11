@@ -43,6 +43,7 @@
     "js-cookie": "^2.0.4",
     "knex": "^0.9.0",
     "lodash": "^3.10.1",
+    "lodash.find": "^3.2.1",
     "morgan": "^1.6.1",
     "node-uuid": "^1.4.7",
     "nodemailer": "^1.10.0",

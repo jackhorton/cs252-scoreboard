@@ -58,6 +58,21 @@ router.post('/sign-up/new', (req, res, next) => {
     });
 });
 
+router.post('/sign-up/existing', (req, res, next) => {
+    const {title, link, description} = req.body && req.body.project;
+    const {name, email, password} = req.body && req.body.user;
+
+    new Project({title, link, description}).fetch({require: true}).then((project) => {
+        return new User({email, project_id: project.get('id'), active: false}).fetch({require: true});
+    }).then((user) => {
+        return user.set({password, name, active: true}).save(null, {method: 'update'});
+    }).then((user) => {
+        res.status(200).send(user.toJSON({status: 'success'}));
+    }).catch((err) => {
+        next(new ErrorCode(422, 'Could not sign up for existing project', err));
+    });
+});
+
 router.post('/sign-up/invite', (req, res, next) => {
     const {name, password, api_token: apiToken} = req.body;
 
