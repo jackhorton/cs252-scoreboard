@@ -78,7 +78,7 @@ const User = bookshelf.Model.extend({
                     return sendMail({
                         to: invited.get('email'),
                         subject: 'You have been invited to a new project in CS252',
-                        text: `${user.get('name')} invited you to a project on the CS252 final project scoreboard. Click on the link below to accept this invitation, which will also allow you to rate other's projects!\n\nhttp://cs252-scoreboard.bluemix.net/#/invite/${invited.get('api_token')}`
+                        text: `${user.get('name')} invited you to a project on the CS252 final project scoreboard. Click on the link below to accept this invitation, which will also allow you to rate other's projects!\n\nhttp://cs252-scoreboard.mybluemix.net/#/invite/${invited.get('api_token')}`
                     });
                 });
             } else {

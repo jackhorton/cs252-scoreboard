@@ -30,7 +30,9 @@ router.post('/accounts/login', (req, res, next) => {
 });
 
 router.get('/account', authorize(), (req, res) => {
-    res.status(200).send(Object.assign({}, req.user, {status: 'success'}));
+    res.status(200).send(req.userModel.toJSON({
+        status: 'success'
+    }));
 });
 
 router.get('/account/tap', authorize({required: false}), (req, res) => {
